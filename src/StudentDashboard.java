@@ -65,7 +65,8 @@ public class StudentDashboard extends JFrame implements ActionListener {
 
         if(e.getSource()==btnMyEnrollment){
 
-           new MyEnrollmentForm(StudentData.StudentID);
+            
+            new MyEnrollmentForm();
            
             dispose();
 

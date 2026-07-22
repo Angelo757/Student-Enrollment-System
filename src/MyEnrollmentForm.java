@@ -17,13 +17,7 @@ public class MyEnrollmentForm extends JFrame implements ActionListener {
     JButton btnRefresh;
     JButton btnClose;
 
-    private int studentId;
-
-    public MyEnrollmentForm(int studentId) {
-
-        this.studentId = studentId;
-
-       
+    public MyEnrollmentForm() {
 
         setTitle("My Enrollment");
         setSize(550, 420);
@@ -44,7 +38,7 @@ public class MyEnrollmentForm extends JFrame implements ActionListener {
         txtStudentID.setBounds(180, 90, 250, 25);
         add(txtStudentID);
 
-        lblName = new JLabel("Name:");
+        lblName = new JLabel("Full Name:");
         lblName.setBounds(60, 130, 100, 25);
         add(lblName);
 
@@ -94,49 +88,49 @@ public class MyEnrollmentForm extends JFrame implements ActionListener {
     }
 
     private void loadEnrollment() {
-
         try {
+            int currentStudentId = StudentData.StudentID;
 
-            DBConnection db = new DBConnection();
+            if (currentStudentId == 0) {
+                txtStatus.setText("No Student ID found");
+                return;
+            }
 
-            String sql =
-                    "SELECT s.student_id, " +
-                    "CONCAT(s.first_name,' ',s.last_name) AS Name, " +
-                    "c.course_name, " +
-                    "e.school_year, " +
-                    "e.status " +
-                    "FROM enrollments e " +
-                    "JOIN students s ON e.student_id=s.student_id " +
-                    "JOIN courses c ON e.course_id=c.course_id " +
-                    "WHERE s.student_id=?";
+            Connection con = DBConnection.getConnection();
 
-            PreparedStatement pst = DBConnection.getConnection().prepareStatement(sql);
             
-            pst.setInt(1, studentId);
+            String sql = "SELECT students.student_id, " +
+                         "CONCAT(students.first_name, ' ', students.last_name) AS Name, " +
+                         "courses.course_name, " +
+                         "enrollments.school_year, " +
+                         "enrollments.status " +
+                         "FROM enrollments, students, courses " +
+                         "WHERE enrollments.student_id = students.student_id " +
+                         "AND enrollments.course_id = courses.course_id " +
+                         "AND students.student_id = ?";
+
+            PreparedStatement pst = con.prepareStatement(sql);
+            pst.setInt(1, currentStudentId);
 
             ResultSet rs = pst.executeQuery();
 
             if (rs.next()) {
-
                 txtStudentID.setText(rs.getString("student_id"));
                 txtName.setText(rs.getString("Name"));
                 txtCourse.setText(rs.getString("course_name"));
                 txtYear.setText(rs.getString("school_year"));
                 txtStatus.setText(rs.getString("status"));
-
             } else {
-
-                txtStudentID.setText("-");
-                txtName.setText("-");
+                txtStudentID.setText(String.valueOf(currentStudentId));
+                txtName.setText(StudentData.FirstName + " " + StudentData.LastName);
                 txtCourse.setText("-");
                 txtYear.setText("-");
                 txtStatus.setText("Not Yet Enrolled");
-
             }
 
             rs.close();
             pst.close();
-            db.getConnection().close();
+            con.close();
 
         } catch (Exception ex) {
             JOptionPane.showMessageDialog(this, ex.getMessage());
@@ -145,7 +139,6 @@ public class MyEnrollmentForm extends JFrame implements ActionListener {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-
         if (e.getSource() == btnRefresh) {
             loadEnrollment();
         }

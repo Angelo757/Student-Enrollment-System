@@ -94,11 +94,9 @@ public class CourseForm extends JFrame implements ActionListener{
         btnDelete=new JButton("Delete");
         btnClear=new JButton("Clear");
         btnUpdate = new JButton("Update");
-        add(btnUpdate);
 
-
-
-
+        // Dito natin inayos ang pwesto ng Add button at iba pang buttons
+        btnAdd.setBounds(350,30,100,30);
         btnUpdate.setBounds(350,70,100,30);
         btnDelete.setBounds(350,110,100,30);
         btnClear.setBounds(350,150,100,30);
@@ -119,6 +117,7 @@ public class CourseForm extends JFrame implements ActionListener{
 
 
         add(btnAdd);
+        add(btnUpdate);
         add(btnDelete);
         add(btnClear);
 

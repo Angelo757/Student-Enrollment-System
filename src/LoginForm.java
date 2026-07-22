@@ -105,61 +105,75 @@ public class LoginForm extends JFrame implements ActionListener {
     }
     
     public void login() {
+        String username = txtUsername.getText().trim();
+        String password = String.valueOf(txtPassword.getPassword());
 
-    String username = txtUsername.getText().trim();
-    String password = String.valueOf(txtPassword.getPassword());
-
-    if (username.isEmpty() || password.isEmpty()) {
-        JOptionPane.showMessageDialog(this, "Please enter username and password.");
-        return;
-    }
-
-    try {
-
-        Connection con = DBConnection.getConnection();
-
-        String sql = "SELECT * FROM users WHERE username=? AND password=?";
-
-        PreparedStatement pst = con.prepareStatement(sql);
-        pst.setString(1, username);
-        pst.setString(2, password);
-
-        ResultSet rs = pst.executeQuery();
-
-        if (rs.next()) {
-
-            String role = rs.getString("role");
-           
-
-            if (role.equalsIgnoreCase("Student")) {
-               StudentData.StudentID = rs.getInt("student_id");
-            }
-
-            JOptionPane.showMessageDialog(this, "Login Successful!");
-
-            dispose();
-
-            if (role.equalsIgnoreCase("Admin")) {
-                new AdminDashboard();
-            } else {
-                new StudentDashboard();
-            }
-
-        } else {
-
-            JOptionPane.showMessageDialog(this, "Invalid Username or Password.");
-
+        if (username.isEmpty() || password.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Please enter username and password.");
+            return;
         }
 
-        rs.close();
-        pst.close();
-        con.close();
+        try {
+            Connection con = DBConnection.getConnection();
+            String sql = "SELECT * FROM users WHERE username=? AND password=?";
+            PreparedStatement pst = con.prepareStatement(sql);
+            pst.setString(1, username);
+            pst.setString(2, password);
 
-    } catch (Exception ex) {
-        JOptionPane.showMessageDialog(this, ex.getMessage());
+            ResultSet rs = pst.executeQuery();
+
+            if (rs.next()) {
+                String role = rs.getString("role");
+
+                JOptionPane.showMessageDialog(this, "Login Successful!");
+                dispose();
+
+                if (role.equalsIgnoreCase("Admin")) {
+                    new AdminDashboard();
+                } else {
+                    String fName = rs.getString("FirstName");
+                    String lName = rs.getString("LastName");
+
+                    rs.close();
+                    pst.close();
+
+                    
+                    String studentSql = "SELECT student_id FROM students WHERE first_name = ? AND last_name = ?";
+                    PreparedStatement studentPs = con.prepareStatement(studentSql);
+                    studentPs.setString(1, fName);
+                    studentPs.setString(2, lName);
+                    ResultSet studentRs = studentPs.executeQuery();
+
+                    if(studentRs.next()){
+                        
+                        StudentData.StudentID = studentRs.getInt("student_id");
+                        StudentData.FirstName = fName;
+                        StudentData.LastName = lName;
+                    } else {
+                        
+                        StudentData.StudentID = 0; 
+                    } 
+                    
+                    studentRs.close();
+                    studentPs.close();
+                    con.close();
+
+                    new StudentDashboard(); 
+                    dispose();
+                }
+
+            } else {
+                JOptionPane.showMessageDialog(this, "Invalid Username or Password.");
+            }
+
+            rs.close();
+            pst.close();
+            con.close();
+
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(this, ex.getMessage());
+        }
     }
-
-}
 
     @Override
     public void actionPerformed(ActionEvent e) 
@@ -172,6 +186,7 @@ public class LoginForm extends JFrame implements ActionListener {
         if (e.getSource() == btnRegister) 
         {
             new RegisterForm();
+            this.dispose();
         }
     }
 }

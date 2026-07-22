@@ -432,10 +432,7 @@ public class StudentForm extends JFrame implements ActionListener{
                     rs.getInt("student_id"),
                     rs.getString("first_name"),
                     rs.getString("last_name"),
-                    rs.getString("gender"),
-                    rs.getString("email"),
-                    rs.getString("phone"),
-                    rs.getString("address")
+                    rs.getString("year_level")
                 });
 
             }
