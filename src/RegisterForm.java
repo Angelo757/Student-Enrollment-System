@@ -122,7 +122,7 @@ public class RegisterForm extends JFrame implements ActionListener {
                 ps.setString(2, lastName);
                 ps.setString(3, username);
                 ps.setString(4, password);
-                ps.setString(5, "Student");
+                ps.setString(5, "student");
 
                 ps.executeUpdate();
 

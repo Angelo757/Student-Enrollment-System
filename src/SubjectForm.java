@@ -3,18 +3,15 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
 
-/**
- *
- * @author angel
- */
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.sql.*;
 
-public class SubjectForm extends JFrame implements ActionListener{
-
+public class SubjectForm extends JFrame implements ActionListener {
 
     JComboBox<String> cmbCourse;
     JTextField txtSearch;
@@ -25,92 +22,63 @@ public class SubjectForm extends JFrame implements ActionListener{
     JTextField txtName;
     JTextField txtUnits;
 
-
     JButton btnAdd;
     JButton btnDelete;
     JButton btnClear;
 
-
     JTable table;
     DefaultTableModel model;
 
-
-
-    public SubjectForm(){
-
+    public SubjectForm() {
 
         setTitle("Subject Management");
-
-        setSize(750,500);
-
+        setSize(750, 500);
         setLocationRelativeTo(null);
-
         setLayout(null);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         
         txtSearch = new JTextField();
         btnSearch = new JButton("Search");
 
-        txtSearch.setBounds(20,180,180,30);
-        btnSearch.setBounds(210,180,100,30);
+        txtSearch.setBounds(20, 180, 180, 30);
+        btnSearch.setBounds(210, 180, 100, 30);
 
         add(txtSearch);
         add(btnSearch);
 
+        JLabel l1 = new JLabel("Course");
+        JLabel l2 = new JLabel("Subject Code");
+        JLabel l3 = new JLabel("Subject Name");
+        JLabel l4 = new JLabel("Units");
 
+        cmbCourse = new JComboBox<>();
+        txtCode = new JTextField();
+        txtName = new JTextField();
+        txtUnits = new JTextField();
 
-        JLabel l1=new JLabel("Course");
+        l1.setBounds(20, 20, 100, 25);
+        cmbCourse.setBounds(130, 20, 180, 25);
 
-        JLabel l2=new JLabel("Subject Code");
+        l2.setBounds(20, 60, 100, 25);
+        txtCode.setBounds(130, 60, 180, 25);
 
-        JLabel l3=new JLabel("Subject Name");
+        l3.setBounds(20, 100, 100, 25);
+        txtName.setBounds(130, 100, 180, 25);
 
-        JLabel l4=new JLabel("Units");
+        l4.setBounds(20, 140, 100, 25);
+        txtUnits.setBounds(130, 140, 180, 25);
 
+        btnAdd = new JButton("Add");
+        btnDelete = new JButton("Delete");
+        btnUpdate = new JButton("Update");
+        btnClear = new JButton("Clear");
 
+        btnAdd.setBounds(400, 20, 100, 30);
+        btnUpdate.setBounds(400, 60, 100, 30);
+        btnDelete.setBounds(400, 100, 100, 30);
+        btnClear.setBounds(400, 140, 100, 30);
 
-        cmbCourse=new JComboBox<>();
-
-        txtCode=new JTextField();
-
-        txtName=new JTextField();
-
-        txtUnits=new JTextField();
-
-
-
-        l1.setBounds(20,20,100,25);
-        cmbCourse.setBounds(130,20,180,25);
-
-
-        l2.setBounds(20,60,100,25);
-        txtCode.setBounds(130,60,180,25);
-
-
-        l3.setBounds(20,100,100,25);
-        txtName.setBounds(130,100,180,25);
-
-
-        l4.setBounds(20,140,100,25);
-        txtUnits.setBounds(130,140,180,25);
-
-
-
-        btnAdd=new JButton("Add");
-
-        btnDelete=new JButton("Delete");
-        btnUpdate=new JButton("Update");
-        
-
-        btnClear=new JButton("Clear");
-
-
-
-        btnAdd.setBounds(400,20,100,30);
-        btnUpdate.setBounds(400,60,100,30);
-        btnDelete.setBounds(400,100,100,30);
-        btnClear.setBounds(400,140,100,30);
         add(btnUpdate);
-
         add(l1);
         add(cmbCourse);
 
@@ -125,33 +93,23 @@ public class SubjectForm extends JFrame implements ActionListener{
         add(btnDelete);
         add(btnClear);
         
-        model=new DefaultTableModel();
+        model = new DefaultTableModel();
 
         model.addColumn("ID");
-
         model.addColumn("Course");
-
         model.addColumn("Code");
-
         model.addColumn("Subject Name");
-
         model.addColumn("Units");
 
-        table=new JTable(model);
+        table = new JTable(model);
         
-        JScrollPane sp=
-        new JScrollPane(table);
-
-
-        sp.setBounds(20,220,700,200);
+        JScrollPane sp = new JScrollPane(table);
+        sp.setBounds(20, 220, 700, 200);
 
         add(sp);
         
         loadCourses();
-
         loadSubjects();
-
-
 
         btnAdd.addActionListener(this);
         btnUpdate.addActionListener(this);
@@ -159,219 +117,171 @@ public class SubjectForm extends JFrame implements ActionListener{
         btnClear.addActionListener(this);
         btnSearch.addActionListener(this);
 
+        // --- Added MouseListener for Row Selection ---
+        table.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                int row = table.getSelectedRow();
+                if (row != -1) {
+                    // Get course name from the table (Column index 1)
+                    String courseNameInTable = model.getValueAt(row, 1) != null ? model.getValueAt(row, 1).toString() : "";
 
+                    // Match and select the item in cmbCourse dropdown
+                    for (int i = 0; i < cmbCourse.getItemCount(); i++) {
+                        String item = cmbCourse.getItemAt(i);
+                        if (item.contains(courseNameInTable)) {
+                            cmbCourse.setSelectedIndex(i);
+                            break;
+                        }
+                    }
+
+                    // Populate text fields from table columns
+                    txtCode.setText(model.getValueAt(row, 2) != null ? model.getValueAt(row, 2).toString() : "");
+                    txtName.setText(model.getValueAt(row, 3) != null ? model.getValueAt(row, 3).toString() : "");
+                    txtUnits.setText(model.getValueAt(row, 4) != null ? model.getValueAt(row, 4).toString() : "");
+                }
+            }
+        });
 
         setVisible(true);
-
     }
 
-    private boolean validateSubject(){
-
-        if(cmbCourse.getSelectedItem()==null){
-
-            JOptionPane.showMessageDialog(this,
-                    "Please select a course.");
-
+    private boolean validateSubject() {
+        if (cmbCourse.getSelectedItem() == null) {
+            JOptionPane.showMessageDialog(this, "Please select a course.");
             return false;
         }
 
-        if(txtCode.getText().trim().isEmpty() ||
-           txtName.getText().trim().isEmpty() ||
-           txtUnits.getText().trim().isEmpty()){
+        if (txtCode.getText().trim().isEmpty() ||
+            txtName.getText().trim().isEmpty() ||
+            txtUnits.getText().trim().isEmpty()) {
 
-            JOptionPane.showMessageDialog(this,
-                    "Complete all fields.");
-
+            JOptionPane.showMessageDialog(this, "Complete all fields.");
             return false;
         }
 
-        try{
-
-            Integer.parseInt(txtUnits.getText());
-
-        }catch(Exception e){
-
-            JOptionPane.showMessageDialog(this,
-                    "Units must be numeric.");
-
+        try {
+            Integer.parseInt(txtUnits.getText().trim());
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, "Units must be numeric.");
             return false;
-
         }
 
         return true;
-
     }
 
-    private boolean subjectExists(String code){
-
-        try{
-            
+    private boolean subjectExists(String code) {
+        try {
             Connection con = DBConnection.getConnection();
             PreparedStatement ps = con.prepareStatement("SELECT subject_id FROM subjects WHERE subject_code=?");
-       
             
-            ps.setString(1,code);
+            ps.setString(1, code);
             ResultSet rs = ps.executeQuery();
             return rs.next();
 
-        }catch(Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return false;
     }
 
-    void loadCourses(){
-
-        try{
+    void loadCourses() {
+        try {
             Connection con = DBConnection.getConnection();
+            ResultSet rs = con.createStatement().executeQuery("SELECT * FROM courses");
 
-
-            ResultSet rs=con.createStatement().executeQuery("SELECT * FROM courses");
-
-
-            while(rs.next()){
+            cmbCourse.removeAllItems(); // Clear existing items before loading
+            while (rs.next()) {
                 cmbCourse.addItem(
-                rs.getInt("course_id")
-                +" - "+
-                rs.getString("course_name")
+                    rs.getInt("course_id") + " - " + rs.getString("course_name")
                 );
-
             }
 
-        }catch(Exception e){
-
+        } catch (Exception e) {
             e.printStackTrace();
-
         }
-
     }
 
-    void addSubject(){
+    void addSubject() {
+        try {
+            if (!validateSubject()) return;
 
-
-        try{
-            if(!validateSubject())
+            if (subjectExists(txtCode.getText().trim())) {
+                JOptionPane.showMessageDialog(this, "Subject code already exists.");
                 return;
-
-            if(subjectExists(txtCode.getText())){
-
-                JOptionPane.showMessageDialog(this,
-                        "Subject code already exists.");
-
-                return;
-
             }
 
-            if(cmbCourse.getSelectedItem()==null){
-
-                JOptionPane.showMessageDialog(
-                null,
-                "Add a course first"
-                );
-
+            if (cmbCourse.getSelectedItem() == null) {
+                JOptionPane.showMessageDialog(null, "Add a course first");
                 return;
-
             }
 
             String selected = cmbCourse.getSelectedItem().toString();
-
-            int courseId=Integer.parseInt(selected.split("-")[0].trim());
+            int courseId = Integer.parseInt(selected.split("-")[0].trim());
 
             Connection con = DBConnection.getConnection();
-
-            PreparedStatement pst=
-            con.prepareStatement(
-            "INSERT INTO subjects"+
-            "(course_id,subject_code,subject_name,units)"+
-            "VALUES(?,?,?,?)"
+            PreparedStatement pst = con.prepareStatement(
+                "INSERT INTO subjects (course_id, subject_code, subject_name, units) VALUES (?,?,?,?)"
             );
 
-            pst.setInt(1,courseId);
-
-            pst.setString(2,txtCode.getText());
-            pst.setString(3,txtName.getText());
-            pst.setInt(4,Integer.parseInt(txtUnits.getText()));
+            pst.setInt(1, courseId);
+            pst.setString(2, txtCode.getText().trim());
+            pst.setString(3, txtName.getText().trim());
+            pst.setInt(4, Integer.parseInt(txtUnits.getText().trim()));
             pst.executeUpdate();
             
-            JOptionPane.showMessageDialog(
-            null,
-            "Subject Added"
-            );
+            JOptionPane.showMessageDialog(null, "Subject Added");
 
             loadSubjects();
             clear();
 
-
-
-        }catch(Exception e){
-
+        } catch (Exception e) {
             e.printStackTrace();
-
         }
-
     }
 
-
-    void updateSubject(){
-
+    void updateSubject() {
         int row = table.getSelectedRow();
 
-        if(row==-1){
-
-            JOptionPane.showMessageDialog(this,
-                    "Select a subject.");
-
+        if (row == -1) {
+            JOptionPane.showMessageDialog(this, "Select a subject.");
             return;
-
         }
 
-        if(!validateSubject())
-            return;
+        if (!validateSubject()) return;
 
-        String selected =
-        cmbCourse.getSelectedItem().toString();
-
+        String selected = cmbCourse.getSelectedItem().toString();
         int courseId = Integer.parseInt(selected.split("-")[0].trim());
-
-        int subjectId = Integer.parseInt(model.getValueAt(row,0).toString());
+        int subjectId = Integer.parseInt(model.getValueAt(row, 0).toString());
 
         String sql = "UPDATE subjects SET course_id=?, subject_code=?, subject_name=?, units=? WHERE subject_id=?";
 
-        try(
+        try (
             Connection con = DBConnection.getConnection();
             PreparedStatement ps = con.prepareStatement(sql)
-        ){
-
-            ps.setInt(1,courseId);
-            ps.setString(2,txtCode.getText());
-            ps.setString(3,txtName.getText());
-            ps.setInt(4,Integer.parseInt(txtUnits.getText()));
-            ps.setInt(5,subjectId);
+        ) {
+            ps.setInt(1, courseId);
+            ps.setString(2, txtCode.getText().trim());
+            ps.setString(3, txtName.getText().trim());
+            ps.setInt(4, Integer.parseInt(txtUnits.getText().trim()));
+            ps.setInt(5, subjectId);
 
             ps.executeUpdate();
 
-            JOptionPane.showMessageDialog(this,
-                    "Subject updated successfully.");
+            JOptionPane.showMessageDialog(this, "Subject updated successfully.");
 
             loadSubjects();
             clear();
 
-        }catch(Exception e){
-
+        } catch (Exception e) {
             e.printStackTrace();
-
         }
-
     }
 
-    void searchSubject(){
-
-        if(txtSearch.getText().trim().isEmpty()){
-
+    void searchSubject() {
+        if (txtSearch.getText().trim().isEmpty()) {
             loadSubjects();
-
             return;
-
         }
 
         model.setRowCount(0);
@@ -381,202 +291,125 @@ public class SubjectForm extends JFrame implements ActionListener{
         "FROM subjects INNER JOIN courses ON subjects.course_id=courses.course_id " +
         "WHERE subjects.subject_name LIKE ? OR subjects.subject_code LIKE ?";
 
-        try(
+        try (
             Connection con = DBConnection.getConnection();
             PreparedStatement ps = con.prepareStatement(sql)
-        ){
+        ) {
+            String search = "%" + txtSearch.getText().trim() + "%";
 
-            String search =
-            "%" + txtSearch.getText() + "%";
-
-            ps.setString(1,search);
-            ps.setString(2,search);
+            ps.setString(1, search);
+            ps.setString(2, search);
 
             ResultSet rs = ps.executeQuery();
 
-            while(rs.next()){
-
+            while (rs.next()) {
                 model.addRow(new Object[]{
-
                     rs.getInt(1),
                     rs.getString(2),
                     rs.getString(3),
                     rs.getString(4),
                     rs.getInt(5)
-
                 });
-
             }
 
-        }catch(Exception e){
-
+        } catch (Exception e) {
             e.printStackTrace();
-
         }
-
     }
 
-    void loadSubjects(){
-
-
+    void loadSubjects() {
         model.setRowCount(0);
 
-        try{
-
-
-            Connection con=
-            DBConnection.getConnection();
-
-            ResultSet rs=
-            con.createStatement()
-            .executeQuery(
-
-            "SELECT subjects.subject_id,"+
-            "courses.course_name,"+
-            "subjects.subject_code,"+
-            "subjects.subject_name,"+
-            "subjects.units "+
-            "FROM subjects "+
-            "INNER JOIN courses "+
-            "ON subjects.course_id=courses.course_id"
-
+        try {
+            Connection con = DBConnection.getConnection();
+            ResultSet rs = con.createStatement().executeQuery(
+                "SELECT subjects.subject_id, courses.course_name, subjects.subject_code, subjects.subject_name, subjects.units " +
+                "FROM subjects INNER JOIN courses ON subjects.course_id=courses.course_id"
             );
 
-            while(rs.next()){
-
-
+            while (rs.next()) {
                 model.addRow(new Object[]{
-
-
                     rs.getInt(1),
-
                     rs.getString(2),
-
                     rs.getString(3),
-
                     rs.getString(4),
-
                     rs.getInt(5)
-
-
                 });
-
-
             }
 
-        }catch(Exception e){
-
+        } catch (Exception e) {
             e.printStackTrace();
-
         }
-
-
     }
 
-    void deleteSubject(){
-
-
+    void deleteSubject() {
         int row = table.getSelectedRow();
 
-        if(row==-1){
-
-            JOptionPane.showMessageDialog(this,
-                    "Please select a subject.");
-
+        if (row == -1) {
+            JOptionPane.showMessageDialog(this, "Please select a subject.");
             return;
-
         }
 
-        int confirm =
-        JOptionPane.showConfirmDialog(
-        this,
-        "Delete this subject?",
-        "Confirm",
-        JOptionPane.YES_NO_OPTION);
-
-        if(confirm!=JOptionPane.YES_OPTION)
-            return;
-
-
-
-        int id=
-        Integer.parseInt(
-        model.getValueAt(row,0).toString()
+        int confirm = JOptionPane.showConfirmDialog(
+            this,
+            "Delete this subject?",
+            "Confirm",
+            JOptionPane.YES_NO_OPTION
         );
 
+        if (confirm != JOptionPane.YES_OPTION) return;
 
+        int id = Integer.parseInt(model.getValueAt(row, 0).toString());
 
-        try{
+        try {
+            Connection con = DBConnection.getConnection();
+            PreparedStatement pst = con.prepareStatement("DELETE FROM subjects WHERE subject_id=?");
 
-
-            Connection con=
-            DBConnection.getConnection();
-
-
-
-            PreparedStatement pst=
-            con.prepareStatement(
-            "DELETE FROM subjects WHERE subject_id=?"
-            );
-
-
-            pst.setInt(1,id);
-
-
+            pst.setInt(1, id);
             pst.executeUpdate();
 
-
             loadSubjects();
+            clear();
 
-
-
-        }catch(Exception e){
-
+        } catch (Exception e) {
             e.printStackTrace();
-
         }
-
-
     }
 
-    void clear(){
-
+    void clear() {
         txtCode.setText("");
         txtName.setText("");
         txtUnits.setText("");
 
         table.clearSelection();
 
-        cmbCourse.setSelectedIndex(0);
+        if (cmbCourse.getItemCount() > 0) {
+            cmbCourse.setSelectedIndex(0);
+        }
 
         txtCode.requestFocus();
-
     }
 
-    public static void main(String[] args){
-
+    public static void main(String[] args) {
         new SubjectForm();
-
     }
 
     @Override
-    public void actionPerformed(ActionEvent e) 
-    {
-        if(e.getSource() == btnAdd){
+    public void actionPerformed(ActionEvent e) {
+        if (e.getSource() == btnAdd) {
             addSubject();
         }
-        if(e.getSource() == btnUpdate){
+        if (e.getSource() == btnUpdate) {
             updateSubject();
         }
-        if(e.getSource() == btnDelete){
+        if (e.getSource() == btnDelete) {
             deleteSubject();
         }
-        if(e.getSource() == btnClear){
+        if (e.getSource() == btnClear) {
             clear();
         }
-        if(e.getSource() == btnSearch){
+        if (e.getSource() == btnSearch) {
             searchSubject();
         }
     }
-
 }

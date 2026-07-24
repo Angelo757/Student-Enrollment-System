@@ -25,9 +25,6 @@ public class StudentDashboard extends JFrame implements ActionListener {
         lblTitle.setBounds(30,20,300,30);
         lblTitle.setFont(new Font("Segoe UI",Font.BOLD,22));
 
-        lblWelcome = new JLabel("Welcome, " + Session.FirstName);
-        lblWelcome.setBounds(500,25,180,20);
-
         btnEnrollment = new JButton("Enrollment Form");
         btnEnrollment.setBounds(200,90,250,40);
         btnEnrollment.addActionListener(this);
